@@ -109,6 +109,7 @@ int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
 void            print_hello(int); // hello
 int             count_active_processes(void); // sysinfo
+void            proc_stats(void); // sched_statistics
 
 // swtch.S
 void            swtch(struct context*, struct context*);
@@ -145,6 +146,8 @@ int             fetchaddr(uint64, uint64*);
 void            syscall();
 int             get_syscall_count(void); // sysinfo
 uint64          sys_procinfo(void); // procinfo
+uint64          sys_sched_statistics(void); // sched_statistics
+uint64          sys_sched_tickets(void); // sched_tickets
 
 // trap.c
 extern uint     ticks;

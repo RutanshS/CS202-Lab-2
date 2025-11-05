@@ -103,7 +103,9 @@ extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
 extern uint64 sys_hello(void); // hello: declaration
 extern uint64 sys_sysinfo(void); // sysinfo: declaration
-extern uint64 sys_procinfo(void);
+extern uint64 sys_procinfo(void); //  procinfo: declaration
+extern uint64 sys_sched_statistics(void); // sched_statistics: declaration
+extern uint64 sys_sched_tickets(void); // sched_tickets: declaration
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -131,7 +133,9 @@ static uint64 (*syscalls[])(void) = {
 [SYS_close]   sys_close,
 [SYS_hello]   sys_hello, // hello: syscall entry
 [SYS_sysinfo] sys_sysinfo, // sysinfo: syscall entry
-[SYS_procinfo]  sys_procinfo,
+[SYS_procinfo]  sys_procinfo, // procinfo: syscall entry
+[SYS_sched_statistics] sys_sched_statistics, // sched_statistics: syscall entry
+[SYS_sched_tickets] sys_sched_tickets, // sched_tickets: syscall entry
 };
 
 uint syscall_count = 0; // sysinfo: syscall counter - stores total number of syscalls

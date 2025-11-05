@@ -42,3 +42,7 @@ entry("hello");
 entry("sysinfo");
 # procinfo 
 entry("procinfo");
+# sched_statistics
+entry("sched_statistics");
+# sched_tickets
+entry("sched_tickets");

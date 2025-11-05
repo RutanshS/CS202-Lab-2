@@ -125,6 +125,8 @@ found:
   p->pid = allocpid();
   p->state = USED;
   p->syscall_counter = 0; 
+  p->tickets = 10000;
+  p->ticks = 0;
 
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
@@ -169,6 +171,8 @@ freeproc(struct proc *p)
   p->chan = 0;
   p->killed = 0;
   p->xstate = 0;
+  p->tickets = 0;
+  p->ticks = 0;
   p->state = UNUSED;
 }
 
@@ -297,6 +301,7 @@ fork(void)
   }
   np->sz = p->sz;
   np->syscall_counter = p->syscall_counter; 
+  np->tickets = p->tickets;
   np->parent = p;
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
@@ -460,6 +465,7 @@ scheduler(void)
         // Switch to chosen process.  It is the process's job
         // to release its lock and then reacquire it
         // before jumping back to us.
+        p->ticks++;
         p->state = RUNNING;
         c->proc = p;
         swtch(&c->context, &p->context);
@@ -706,4 +712,22 @@ count_active_processes(void)
     }
   }
   return count;
+}
+
+// sched_statistics: print the scheduler statistics for all running processes.
+void
+proc_stats(void)
+{
+  struct proc *p;
+  for (p = proc; p < &proc[NPROC]; p++) 
+  {
+    acquire(&p->lock);
+
+    if (p->state != UNUSED) 
+    {
+      printf("%d(%s): tickets: %d, ticks: %d\n", p->pid, p->name, p->tickets, p->ticks);
+    }
+    
+    release(&p->lock);
+  }
 }

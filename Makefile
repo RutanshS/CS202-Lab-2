@@ -137,6 +137,7 @@ UPROGS=\
 	$U/_test\
 	$U/_sysinfo_test\
 	$U/_lab_test\
+	$U/_lab2\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
