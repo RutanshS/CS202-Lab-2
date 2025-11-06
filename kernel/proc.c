@@ -15,6 +15,16 @@ struct proc *initproc;
 int nextpid = 1;
 struct spinlock pid_lock;
 
+// pseudo random generator (https://stackoverflow.com/a/7603688)
+unsigned short lfsr = 0xACE1u;
+unsigned short bit;
+
+unsigned short rand()
+{
+  bit = ((lfsr >> 0)^ (lfsr >> 2) ^ (lfsr >> 3)^ (lfsr >> 5)) & 1;
+  return lfsr = (lfsr >> 1) | (bit << 15);
+}
+
 extern void forkret(void);
 static void freeproc(struct proc *p);
 
@@ -459,23 +469,68 @@ scheduler(void)
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
 
-    for(p = proc; p < &proc[NPROC]; p++) {
-      acquire(&p->lock);
-      if(p->state == RUNNABLE) {
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
-        p->ticks++;
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
-
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
+    #if defined(LOTTERY)
+      // Lottery Scheduler
+      int total_tickets = 0;
+      for (p = proc; p < &proc[NPROC]; p++) {
+        acquire(&p->lock);
+        if (p->state == RUNNABLE) {
+          total_tickets += p->tickets;
+        }
+        release(&p->lock);
       }
-      release(&p->lock);
-    }
+      if (total_tickets > 0) {
+        unsigned short winner = rand() % total_tickets;
+        int counter = 0;
+
+        for (p = proc; p < &proc[NPROC]; p++) {
+          acquire(&p->lock);
+          if (p->state != RUNNABLE) {
+            release(&p->lock);
+            continue;
+          }
+
+          counter += p->tickets;
+
+          if (counter > winner) {
+            // Switch to chosen process.  It is the process's job
+            // to release its lock and then reacquire it
+            // before jumping back to us.
+            p->ticks++;
+            p->state = RUNNING;
+            c->proc = p;
+            swtch(&c->context, &p->context);
+
+            // Process is done running for now.
+            // It should have changed its p->state before coming back.
+            c->proc = 0;
+            release(&p->lock);
+            break;
+          } else {
+            release(&p->lock);
+          }
+        }
+      }
+    #else
+      // Original xv6 Round Robin Scheduler
+      for(p = proc; p < &proc[NPROC]; p++) {
+        acquire(&p->lock);
+        if(p->state == RUNNABLE) {
+          // Switch to chosen process.  It is the process's job
+          // to release its lock and then reacquire it
+          // before jumping back to us.
+          p->ticks++;
+          p->state = RUNNING;
+          c->proc = p;
+          swtch(&c->context, &p->context);
+
+          // Process is done running for now.
+          // It should have changed its p->state before coming back.
+          c->proc = 0;
+        }
+        release(&p->lock);
+      }
+    #endif
   }
 }
 
