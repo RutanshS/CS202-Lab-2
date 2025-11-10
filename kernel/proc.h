@@ -107,4 +107,6 @@ struct proc {
   int syscall_counter;
   int tickets;                 // For lottery scheduler
   int ticks;                   // Count of scheduling ticks
+  int stride;                  // Stride for process
+  int pass;                    // pass value for process
 };

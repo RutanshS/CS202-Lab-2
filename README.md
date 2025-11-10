@@ -13,6 +13,12 @@ make clean
 make LAB2=LOTTERY
 make qemu
 ```
+### 2. To compile and run Stride Scheduler
+```bash
+make clean
+make LAB2=STRIDE
+make qemu
+```
 
 ## Testing
 Once you have `xv6` running with desired scheduler, use the lab2 user program to test it. This program forks a number of child processes, assigns them tickets, lets them run for a set number of ticks and then prints the stats. 
