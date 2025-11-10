@@ -173,7 +173,10 @@ sys_sched_tickets(void)
   argint(0, &tickets);
 
   if (tickets >= 0 && tickets <= 10000) {
+    acquire(&myproc()->lock);
     myproc()->tickets = tickets;
+    myproc()->stride = 1000 / myproc()->tickets;
+    release(&myproc()->lock);
   }
 
   return 0;
