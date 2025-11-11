@@ -13,7 +13,7 @@ make clean
 make LAB2=LOTTERY
 make qemu
 ```
-### 2. To compile and run Stride Scheduler
+### 3. To compile and run Stride Scheduler
 ```bash
 make clean
 make LAB2=STRIDE
