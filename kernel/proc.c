@@ -513,7 +513,6 @@ scheduler(void)
           }
         }
       }
-     }  
     
     #elif defined(STRIDE)
       //Stride Scheduler
